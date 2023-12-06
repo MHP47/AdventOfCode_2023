@@ -21,7 +21,14 @@ def part_1(p_Input):
 
 
 def part_2(p_Input):
-    pass
+    return part_1(
+        '\n'.join(
+            [
+                cat(re.findall('\d', x))
+                for x in p_Input.splitlines()
+            ]
+        )
+    )
 
 
 example_input_1 = """Time:      7  15   30
@@ -32,5 +39,5 @@ challenge_input = Input(6)
 assert(part_1(example_input_1) == 288)
 print(f"Part 1: {part_1(challenge_input)}")
 
-assert(part_2(example_input_1) == None)
+assert(part_2(example_input_1) == 71503)
 print(f"Part 2: {part_2(challenge_input)}")
