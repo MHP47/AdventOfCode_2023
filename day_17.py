@@ -25,7 +25,28 @@ def part_1(p_Input):
 
 
 def part_2(p_Input):
-    pass
+    grid = Grid(rows = p_Input.strip().splitlines())
+    for k,v in grid.items(): grid[k] = int(v)
+    start = (0, 0)
+    goal = (grid.width-1, grid.height-1)
+    seen = set()
+    frontier = [(0, start, 0, 1)] # heat_loss, position, direction, dir_steps
+    adjacent = lambda x, y: ((x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)) # R D L U
+
+    while frontier:
+        loss, current, direction, steps = heappop(frontier)
+        k = (current, direction, steps)
+        if k in seen: continue
+        seen.add(k)
+        if current == goal and steps >= 4: return loss - 1
+        neighbours = adjacent(*current)
+        if steps < 10:
+            if (neighbour := neighbours[direction]) in grid:
+                heappush(frontier, (loss + grid[neighbour], neighbour, direction, steps + 1))
+        if steps >= 4:
+            for d in [(direction - 1) % 4, (direction + 1) % 4]:
+                if (neighbour := neighbours[d]) in grid:
+                    heappush(frontier, (loss + grid[neighbour], neighbour, d, 1))
 
 
 example_input_1 = """2413432311323
@@ -42,10 +63,17 @@ example_input_1 = """2413432311323
 2546548887735
 4322674655533
 """
+example_input_2 = """111111111111
+999999999991
+999999999991
+999999999991
+999999999991
+"""
 challenge_input = Input(17)
 
 assert(part_1(example_input_1) == 102)
 print(f"Part 1: {part_1(challenge_input)}")
 
-assert(part_2(example_input_1) == None)
+assert(part_2(example_input_1) == 94)
+assert(part_2(example_input_2) == 71)
 print(f"Part 2: {part_2(challenge_input)}")
