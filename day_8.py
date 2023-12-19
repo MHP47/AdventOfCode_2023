@@ -3,29 +3,27 @@ from utils import *
 
 def part_1(p_Input):
     instructions, nav = p_Input.split('\n\n')
-    instructions = [0 if x == 'L' else 1 for x in instructions]
+    instructions = itertools.cycle([0 if x == 'L' else 1 for x in instructions])
     network = dict()
     for i in [ {a: (b,c)} for a,b,c in [re.findall(r'\w+', x) for x in nav.splitlines()]]:
         network.update(i)
     curr = 'AAA'
     for counter in itertools.count(0):
-        direction = instructions[counter%len(instructions)]
-        next_dest = network[curr][direction]
+        next_dest = network[curr][next(instructions)]
         if next_dest == 'ZZZ': return counter + 1
         curr = next_dest
 
 
 def part_2(p_Input):
     instructions, nav = p_Input.split('\n\n')
-    instructions = [0 if x == 'L' else 1 for x in instructions]
+    instructions = itertools.cycle([0 if x == 'L' else 1 for x in instructions])
     network = dict()
     for i in [ {a: (b,c)} for a,b,c in [re.findall(r'\w+', x) for x in nav.splitlines()]]:
         network.update(i)
     path_lengths = []
     for curr in [x for x in network.keys() if x[-1] == 'A']:
         for counter in itertools.count(0):
-            direction = instructions[counter%len(instructions)]
-            next_dest = network[curr][direction]
+            next_dest = network[curr][next(instructions)]
             if next_dest[-1] == 'Z':
                 path_lengths.append(counter + 1)
                 break
