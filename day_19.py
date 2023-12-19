@@ -46,7 +46,35 @@ def part_1(p_Input):
 
 
 def part_2(p_Input):
-    pass
+    rules,_ = p_Input.strip().split('\n\n')
+    matcher = re.compile(r'^(\w+){(.*)}$')
+    rules = { a: b.split(',') for a,b in [matcher.match(text).groups() for text in rules.splitlines()] }
+    matcher = re.compile(r'^([xmas])([<>])(\d+):(\w+)$')
+
+    def work(cmd, parts = {'x': (1, 4000), 'm': (1, 4000), 'a': (1, 4000), 's': (1, 4000)}):
+        if cmd == 'R':
+            return 0
+        if cmd == 'A':
+            return math.prod(len(range(*b))+1 for b in parts.values())
+        total = 0
+        for rule in rules[cmd]:
+            try:
+                t,o,v,d = matcher.match(rule).groups()
+                v = int(v)
+                new_parts = dict(parts)
+                if parts[t][0] < v < parts[t][1]:
+                    if o == '<':
+                        new_parts[t] = (parts[t][0], v - 1)
+                        parts[t] = (v, parts[t][1])
+                    else:
+                        new_parts[t] = (v + 1, parts[t][1])
+                        parts[t] = (parts[t][0], v)
+                    total += work(d, new_parts)
+            except AttributeError:
+                total += work(rule, parts)
+        return total
+
+    return work('in')
 
 
 example_input_1 = """px{a<2006:qkq,m>2090:A,rfg}
@@ -72,5 +100,5 @@ challenge_input = Input(19)
 assert(part_1(example_input_1) == 19114)
 print(f"Part 1: {part_1(challenge_input)}")
 
-assert(part_2(example_input_1) == None)
+assert(part_2(example_input_1) == 167409079868000)
 print(f"Part 2: {part_2(challenge_input)}")
