@@ -39,7 +39,32 @@ def part_1(p_Input):
 
 
 def part_2(p_Input):
-    pass
+    def shoelace(vertices):
+        shoelace = 0
+        for i in range(len(vertices) - 1):
+            shoelace += vertices[i][0] * vertices[i + 1][1] - \
+                vertices[i + 1][0] * vertices[i][1]
+        return abs(shoelace) // 2
+
+    UP = (1, 0)
+    DOWN = (-1, 0)
+    LEFT = (0, -1)
+    RIGHT = (0, 1)
+    D = { '0': RIGHT, '1': DOWN, '2': LEFT, '3': UP }
+    move = lambda x,y: tuple(sum(z) for z in zip(x, y))
+    dist = lambda x,y: tuple(math.prod(z) for z in zip(x, y))
+    position = (0,0)
+    grid = []
+    area = 0
+    for _,_,c in [x.split() for x in p_Input.strip().splitlines()]:
+        # direction to dig: 0 means R, 1 means D, 2 means L, and 3 means U.
+        l = int(f"0x{c[2:-2]}", 0)
+        area += l
+        d = c[-2]
+        position = move(position, dist(D[d], (l, l)))
+        grid.append(position)
+
+    return area // 2 + shoelace(grid) + 1
 
 
 example_input_1 = """R 6 (#70c710)
@@ -62,5 +87,5 @@ challenge_input = Input(18)
 assert(part_1(example_input_1) == 62)
 print(f"Part 1: {part_1(challenge_input)}")
 
-assert(part_2(example_input_1) == None)
+assert(part_2(example_input_1) == 952408144115)
 print(f"Part 2: {part_2(challenge_input)}")
