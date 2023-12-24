@@ -1,4 +1,5 @@
 from utils import *
+import z3
 
 
 class Hailstone:
@@ -42,7 +43,22 @@ def part_1(p_Input):
 
 
 def part_2(p_Input):
-    pass
+    hailstones = [Hailstone(*parse_ints(x)) for x in p_Input.strip().splitlines()]
+    solver = z3.Solver()
+    x, y, z, vx, vy, vz = [z3.Int(var) for var in ('x', 'y', 'z', 'vx', 'vy', 'vz')]
+    for i,h in enumerate(hailstones[:4]):
+        t = z3.Int(f"t{i}")
+        solver.add(t >= 0)
+        solver.add(x + vx * t == h.px + h.vx * t)
+        solver.add(y + vy * t == h.py + h.vy * t)
+        solver.add(z + vz * t == h.pz + h.vz * t)
+
+    if solver.check() == z3.sat:
+        model = solver.model()
+        (x, y, z) = (model.eval(x), model.eval(y), model.eval(z))
+        return x.as_long() + y.as_long() + z.as_long()
+    else:
+        raise ValueError("Invalid function")
 
 
 example_input_1 = """19, 13, 30 @ -2,  1, -2
@@ -56,5 +72,5 @@ challenge_input = Input(24)
 # assert(part_1(example_input_1) == None)
 print(f"Part 1: {part_1(challenge_input)}")
 
-assert(part_2(example_input_1) == None)
+assert(part_2(example_input_1) == 47)
 print(f"Part 2: {part_2(challenge_input)}")
